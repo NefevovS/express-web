@@ -1,5 +1,15 @@
 import {Router, urlencoded, static as staticMiddleware} from "express";
-import {mainPage, detailPage, addPage, add, setDone, remove, setOrder,addendumWrapper} from "./controllers/todos.js";
+import {
+    mainPage,
+    detailPage,
+    addPage,
+    add,
+    setDone,
+    remove,
+    setOrder,
+    addendumWrapper,
+    mostActiveUsers
+} from "./controllers/todos.js";
 import methodOverride from "method-override"
 import {
     extendFlashAPI,
@@ -48,6 +58,7 @@ router.post("/register",isGuest,registerV,handleErrors,register)
 router.get("/login",isGuest,getErrors,loginPage)
 router.post("/login",isGuest,loginV,handleErrors,login)
 router.use(isLoggedIn)
+router.get("/mostactive",mostActiveUsers)
 router.post("/logout",logout)
 router.get(`/add`,getErrors, addPage)
 router.get(`/:id`, detailPage)
@@ -57,4 +68,5 @@ router.put(`/:id`, setDone)
 router.delete(`/:id`, remove)
 router.post('/setorder', setOrder)
 router.use(mainErrorHandler, error500Handler)
+
 export default router
