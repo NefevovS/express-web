@@ -12,9 +12,6 @@ const app = express();
 
 app.locals.appTitle = process.env.APPTITLE || 'Express';
 
-app.set('view engine', 'ejs');
-app.set('views', './source/templates');
-
 (async () => {
     await connectToDB();
     app.use('/', router);

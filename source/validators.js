@@ -1,20 +1,36 @@
-import {body} from "express-validator";
-import {getUser} from "./models/users.js";
-import {timingSafeEqual} from "node:crypto"
-import {pbkdf2Promisified} from "./utility.js";
+import { timingSafeEqual } from 'node:crypto';
+import { body } from 'express-validator';
 
-const todoV = [body("title").isString().trim().notEmpty().withMessage("Заголовок не указан"), body("desc").isString().trim()]
+import { getUser } from './models/users.js';
+import { pbkdf2Promisified } from './utility.js';
 
-const registerV=[body("username").isString().trim().notEmpty().withMessage("Нужно указать имя пользователя").custom(async (value)=>{
-    if(await getUser(value)) throw new Error("Польватель с таким именем уже зарегестрирован")
-    return true
-}),
-body("password").isString().trim().notEmpty().withMessage("Не указан пароль") ,
+const todoV = [
+    body('title').isString().trim().notEmpty()
+        .withMessage('Заголовок не указан'),
+    body('desc').isString().trim()
+];
+export { todoV };
 
-body("password2").isString().trim().notEmpty().withMessage("Не указан повтор пароля").custom((value,{req})=>{
-    if (value!==req.body.password) throw new Error("Пароли должны быть одинаковыми")
-    return true
-})]
+const registerV = [
+    body('username').isString().trim().notEmpty()
+        .withMessage('Не указано имя пользователя')
+        .custom(async (value) => {
+            if (await getUser(value))
+                throw new Error('Пользователь с таким именем уже ' +
+                                'зарегистрирован');
+            return true;
+        }),
+    body('password').isString().trim().notEmpty()
+        .withMessage('Не указан пароль'),
+    body('password2').isString().trim().notEmpty()
+        .withMessage('Не указан повтор пароля')
+        .custom((value, { req }) => {
+            if (req.body.password !== value)
+                throw new Error('Введенные пароли не совпадают');
+            return true;
+        })
+];
+export { registerV };
 
 const loginV = [
     body('username').isString().trim().notEmpty()
@@ -26,7 +42,7 @@ const loginV = [
                 return true;
             } else
                 throw new Error('Пользователь с таким именем не ' +
-                    'найден');
+                                'найден');
         }),
     body('password').isString().trim().notEmpty()
         .withMessage('Не указан пароль')
@@ -35,7 +51,7 @@ const loginV = [
                 const savedPassword = req.__user.password;
                 const salt = req.__user.salt;
                 const password = await pbkdf2Promisified(value, salt,
-                    100000, 32, 'sha256');
+                                             100000, 32, 'sha256');
                 if (timingSafeEqual(savedPassword, password))
                     return true;
                 else
@@ -44,9 +60,4 @@ const loginV = [
                 return true;
         })
 ];
-
-
-
-
-
-export {todoV,registerV,loginV}
+export { loginV };

@@ -22,28 +22,28 @@ const scTodo = new Schema({
     }
 }, {
     versionKey: false,
-    statics:{
-        async findOneAndSetDone(id,user){
-            const todo=await this.findOne({_id:id,user:user})
-            if (todo) await todo.setDone()
-            return todo
+    statics: {
+        async findOneAndSetDone(id, user) {
+            const todo = await this.findOne({ _id: id, user: user });
+            if (todo)
+                await todo.setDone();
+            return todo;
         }
     },
-    query:{
-        contains(val){
+    query: {
+        contains(val) {
             return this.or([
-                {title:new RegExp(val,"i")},
-                {desc:new RegExp(val,"i")}
-            ])
+                { title: new RegExp(val, 'i') },
+                { desc: new RegExp(val, 'i') }
+            ]);
         }
     }
 });
 scTodo.index({ done: 1, createdAt: 1 });
-scTodo.method("setDone",async function(){
-    this.done=true;
-    await this.save()
-})
-
+scTodo.method('setDone', async function () {
+    this.done = true;
+    await this.save();
+});
 
 const scUser = new Schema({
     username: {
